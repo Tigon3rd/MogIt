@@ -424,16 +424,27 @@ local function loadInitialize(self, level)
 			if #C_TransmogCollection.GetOutfits() > 0 then
 				for i, outfit in ipairs(C_TransmogCollection.GetOutfits()) do
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = outfit.name
+					local name, icon = C_TransmogCollection.GetOutfitInfo(outfit)
+					info.text = name
 					info.notCheckable = true
 					info.func = function(self, outfitID)
-						mog:PreviewFromOutfit(currentPreview, C_TransmogCollection.GetOutfitSources(outfitID))
-						local title = C_TransmogCollection.GetOutfitName(outfitID)
+						
+						local itemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID)
+						local itemTransmogInfo = {} -- Table variable to hold each itemInfo table from within the itemTransmogInfoList
+						local appearanceSources = {} -- Table variable to hold the appearanceIDs from the itemTransmogInfo table
+						for i = 1, 19 do
+							local itemTransmogInfo = itemTransmogInfoList[i]
+							local appearanceID = itemTransmogInfo.appearanceID
+							appearanceSources[i] = appearanceID
+						end
+						
+						mog:PreviewFromOutfit(currentPreview, appearanceSources)
+						local title = name
 						currentPreview.TitleText:SetText(title)
 						currentPreview.data.title = title
 						CloseDropDownMenus()
 					end
-					info.arg1 = outfit.outfitID
+					info.arg1 = outfit
 					self:AddButton(info, level)
 				end
 			else
